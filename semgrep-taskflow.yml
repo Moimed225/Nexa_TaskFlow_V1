@@ -1,0 +1,16 @@
+﻿rules:
+  - id: nexa-sql-string-concatenation
+    patterns:
+      - pattern: $CONN.execute("..." + $VAR + "...")
+    message: "Injection SQL potentielle : utilisez une requête paramétrée avec '?'."
+    languages: [python]
+    severity: ERROR
+
+  - id: nexa-hardcoded-api-key
+    patterns:
+      - pattern-either:
+          - pattern: PAYMENT_API_KEY = "..."
+          - pattern: SECRET_KEY = "..."
+    message: "Secret ou clé API codé en dur détecté dans le code source."
+    languages: [python]
+    severity: ERROR

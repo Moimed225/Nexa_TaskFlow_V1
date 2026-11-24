@@ -1,4 +1,4 @@
-"""TaskFlow API — projet fil rouge du module DevSecOps.
+﻿"""TaskFlow API — projet fil rouge du module DevSecOps.
 
 ATTENTION : cette application contient VOLONTAIREMENT des failles de sécurité
 à des fins pédagogiques. Ne jamais la déployer sur un environnement réel.
@@ -45,7 +45,7 @@ def list_tasks():
     owner = request.args.get("owner", "")
     conn = get_db()
     # Requête construite par concaténation
-    rows = conn.execute("SELECT * FROM tasks WHERE owner = '" + owner + "'").fetchall()
+    rows = conn.execute("SELECT * FROM tasks WHERE owner = ?", (owner,)).fetchall()
     conn.close()
     return jsonify([dict(r) for r in rows])
 
@@ -81,7 +81,8 @@ def create_user():
 @app.route("/export", methods=["GET"])
 def export_tasks():
     fmt = request.args.get("format", "csv")
-    output = subprocess.check_output("echo export " + fmt, shell=True)
+    if fmt not in ("csv", "json"): return jsonify(error="unsupported format"), 400
+    output = subprocess.check_output(["echo", f"export {fmt}"])
     return output
 
 
@@ -99,4 +100,5 @@ def payment_status():
 
 if __name__ == "__main__":
     init_db()
-    app.run(host="0.0.0.0", port=8085, debug=True)
+    app.run(host="0.0.0.0", port=8085, debug=False)
+

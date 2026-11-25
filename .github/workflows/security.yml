@@ -1,5 +1,3 @@
-﻿New-Item -ItemType Directory -Force -Path "$PWD\.github\workflows" | Out-Null
-$securityWorkflow = @'
 name: Security Quality Gate
 
 on:
@@ -39,5 +37,3 @@ jobs:
         run: pip install checkov
       - name: Run Checkov on Terraform, Kubernetes and Helm
         run: checkov -d infra -d k8s -d charts/taskflow --compact --soft-fail false
-'@
-[System.IO.File]::WriteAllText("$PWD\.github\workflows\security.yml", $securityWorkflow, [System.Text.UTF8Encoding]::new($false))

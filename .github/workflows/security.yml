@@ -1,4 +1,6 @@
-﻿name: Security Quality Gate
+﻿New-Item -ItemType Directory -Force -Path "$PWD\.github\workflows" | Out-Null
+$securityWorkflow = @'
+name: Security Quality Gate
 
 on:
   pull_request:
@@ -24,3 +26,18 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  checkov-iac:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Checkov
+        run: pip install checkov
+      - name: Run Checkov on Terraform, Kubernetes and Helm
+        run: checkov -d infra -d k8s -d charts/taskflow --compact --soft-fail false
+'@
+[System.IO.File]::WriteAllText("$PWD\.github\workflows\security.yml", $securityWorkflow, [System.Text.UTF8Encoding]::new($false))
